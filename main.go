@@ -15,9 +15,11 @@ import (
 )
 
 const (
-	screenWidth  = 640
-	screenHeight = 480
+	screenWidth  = 1024
+	screenHeight = 768
 )
+
+const numStars = 250
 
 type Game struct {
 	Ship  *ship.Ship
@@ -27,11 +29,7 @@ type Game struct {
 func NewGame() *Game {
 	g := Game{
 		Ship:  ship.New("assets/ship.png"),
-		Stars: make([]*star.Star, 250),
-	}
-
-	for i := 0; i < len(g.Stars); i++ {
-		g.Stars[i] = star.New(screenWidth, screenHeight)
+		Stars: star.Make(numStars, screenWidth, screenHeight),
 	}
 
 	return &g
@@ -48,16 +46,16 @@ func (g *Game) Update() error {
 		r += 0.1
 	}
 
-	g.Ship.Dy *= 0.001
-	g.Ship.Dx *= 0.001
+	g.Ship.Dy *= 0.99
+	g.Ship.Dx *= 0.99
 
 	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		g.Ship.Dy = math.Cos(r)
-		g.Ship.Dx = -math.Sin(r)
+		g.Ship.Dy += 0.1 * math.Cos(r)
+		g.Ship.Dx += 0.1 * -math.Sin(r)
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		g.Ship.Dy = -math.Cos(r)
-		g.Ship.Dx = math.Sin(r)
+		g.Ship.Dy += 0.1 * -math.Cos(r)
+		g.Ship.Dx += 0.1 * math.Sin(r)
 	}
 
 	// move stars by delta
