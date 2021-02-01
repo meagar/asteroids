@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 
+	_ "image/jpeg"
 	_ "image/png"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -31,9 +32,11 @@ func NewGame() *Game {
 		Ship:  ship.New("assets/ship.png"),
 		Stars: star.Make(numStars, screenWidth, screenHeight),
 	}
-
+	jp = &ebiten.DrawImageOptions{}
 	return &g
 }
+
+var jp *ebiten.DrawImageOptions
 
 // Update proceeds the game state.
 // Update is called every tick (1/60 [s] by default).
@@ -46,8 +49,11 @@ func (g *Game) Update() error {
 		r += 0.1
 	}
 
-	g.Ship.Dy *= 0.99
-	g.Ship.Dx *= 0.99
+	// g.Ship.Dy *= 0.99
+	// g.Ship.Dx *= 0.99
+
+	g.Ship.X += g.Ship.Dx
+	g.Ship.Y += g.Ship.Dy
 
 	if ebiten.IsKeyPressed(ebiten.KeyUp) {
 		g.Ship.Dy += 0.1 * math.Cos(r)
@@ -86,6 +92,9 @@ var r float64
 // Draw draws the game screen.
 // Draw is called every frame (typically 1/60[s] for 60Hz display).
 func (g *Game) Draw(screen *ebiten.Image) {
+	screen.DrawImage(jup, jp)
+	jp.GeoM.Reset()
+	jp.GeoM.Translate(g.Ship.X*0.01, g.Ship.Y*0.01)
 	// Write your game's rendering.
 
 	// Draw stars
@@ -117,12 +126,19 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return screenWidth, screenHeight
 }
 
+var jup *ebiten.Image
+
 func main() {
 	game := NewGame()
-
+	img, _, err := ebitenutil.NewImageFromFile("assets/jupiter.jpg")
+	if err != nil {
+		panic(err)
+	}
+	jup = img
 	// Sepcify the window size as you like. Here, a doulbed size is specified.
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Your game's title")
+	// ebiten.SetFullscreen(true)
 	// Call ebiten.RunGame to start your game loop.
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)

@@ -16,35 +16,16 @@ type Star struct {
 	Op  *ebiten.DrawImageOptions
 }
 
-var imgCache map[byte]*ebiten.Image
-var colorCache map[byte]*color.RGBA
-
-func init() {
-	imgCache = make(map[byte]*ebiten.Image)
-	colorCache = make(map[byte]*color.RGBA)
+func Make(numStars int, screenWidth, screenHeight float64) []*Star {
+	imgCache := make([]*ebiten.Image, 255)
 
 	for i := uint8(0); i < 255; i++ {
-		loadColor(i)
-		loadImage(i)
+		img := ebiten.NewImage(1, 1)
+		img.Set(0, 0, &color.Gray{Y: i})
+
+		imgCache[i] = img
 	}
-}
 
-func loadImage(depth uint8) {
-	img := ebiten.NewImage(1, 1)
-	img.Fill(colorCache[depth])
-	imgCache[depth] = img
-}
-
-func loadColor(depth uint8) {
-	colorCache[depth] = &color.RGBA{
-		R: depth,
-		G: depth,
-		B: depth,
-		A: 255,
-	}
-}
-
-func Make(numStars int, screenWidth, screenHeight float64) []*Star {
 	stars := make([]*Star, numStars)
 
 	for i := range stars {
@@ -57,6 +38,7 @@ func Make(numStars int, screenWidth, screenHeight float64) []*Star {
 			Op:  &ebiten.DrawImageOptions{},
 			Img: imgCache[uint8(depth)],
 		}
+		stars[i].Op.GeoM.Reset()
 	}
 
 	return stars

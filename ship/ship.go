@@ -1,8 +1,6 @@
 package ship
 
 import (
-	"fmt"
-
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
@@ -14,7 +12,8 @@ type Ship struct {
 
 	Dx float64
 	Dy float64
-
+	X  float64
+	Y  float64
 	Op *ebiten.DrawImageOptions
 }
 
@@ -27,7 +26,6 @@ func New(path string) *Ship {
 
 	w, h := img.Size()
 
-	fmt.Println(w, h)
 	return &Ship{
 		Img: img,
 		// ScaleX: 0.5,
